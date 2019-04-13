@@ -116,7 +116,7 @@ tf.Variable(参数，数据类型(可以不写，不写的时候由TensorFlow自
 
 ![Image_text](https://raw.githubusercontent.com/OneStepAndTwoSteps/TensorFlow_notes/master/static/%E6%95%B0%E6%8D%AE%E6%B5%81%E5%9B%BE2.jpg)
 
-## TensorFlow变量：__
+## TensorFlow变量：
 
 TensorFlow变量的作用主要作用是维护特定节点的状态，如深度学习或者机器学习的模型参数
 
