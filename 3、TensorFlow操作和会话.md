@@ -42,18 +42,18 @@ __TensorFlow 典型的计算和控制操作：__
 
 __如何进行数据填充:__
 			
-			通常利用python的数据字典，比如说
+		通常利用python的数据字典，比如说
 
-			# x=tf.placehodler(dtype,shape,name)    定义了一个占位符 placehodler中的三个参数分别对应 数据类型，形状，操作名称
+		# x=tf.placehodler(dtype,shape,name)    定义了一个占位符 placehodler中的三个参数分别对应 数据类型，形状，操作名称
 
-			# 定义了两个正向的标量
-			x=tf.placehodler(tf.int16,shape=(),name='x')
-			y=tf.placehodler(tf.int16,shape=(),name='y')
+		# 定义了两个正向的标量
+		x=tf.placehodler(tf.int16,shape=(),name='x')
+		y=tf.placehodler(tf.int16,shape=(),name='y')
 
-			# 建立会话，然后填充数据(feed_dict={x:2,y=3})，并进行运算 (add)
-			with tf.Session() as sess:
-				print(sess.run(add,feed_dict={x:2,y=3}))  输出结果 5
-				print(sess.run(mul,feed_dict={x:2,y=3}))  输出结果 6
+		# 建立会话，然后填充数据(feed_dict={x:2,y=3})，并进行运算 (add)
+		with tf.Session() as sess:
+			print(sess.run(add,feed_dict={x:2,y=3}))  输出结果 5
+			print(sess.run(mul,feed_dict={x:2,y=3}))  输出结果 6
 
 			要从数据流图中取数据要通过sess.run这种方式执行，如果要向数据流图中填充数据，一般是通过占位符操作进行填充。在数据流图真正进行执行之前，数据流图其实只是一个壳，所谓的壳就是说他没有真实的数据在里面流动，此时Tensor(张量)里面什么都没有。
 
@@ -70,25 +70,25 @@ __注意：__
 
 __1.创建会话__
 
-			sess=tf.Session(target=..,graph=...,config=...)           
+		sess=tf.Session(target=..,graph=...,config=...)           
  
-			target 会话连接的执行引擎   graph 会话加载的数据流图 config 会话启动时的配置项
+		target 会话连接的执行引擎   graph 会话加载的数据流图 config 会话启动时的配置项
 
-			traget 表示连接TensorFlow进程的执行引擎，也就是你本地的机器
+		traget 表示连接TensorFlow进程的执行引擎，也就是你本地的机器
 
-			graph  会话加载的数据流图默认加载你定义的数据流图，当你同时定义多章数据流图时，这个时候你可以显式的定义你要使用哪一张数据流图
+		graph  会话加载的数据流图默认加载你定义的数据流图，当你同时定义多章数据流图时，这个时候你可以显式的定义你要使用哪一张数据流图
 
-			config 比如说可以配置在使用数据流图的过程中，是否要打印设备的日志，是否打开调试信息，是否要去追踪一些数据流图的信息等等。
+		config 比如说可以配置在使用数据流图的过程中，是否要打印设备的日志，是否打开调试信息，是否要去追踪一些数据流图的信息等等。
 
-			可以在官网的api文档中查到具体细节。
+		可以在官网的api文档中查到具体细节。
 
 __2.执行sess.run方法获取张量或者执行操作__
 
-			sess.run(..)
+		sess.run(..)
 
 __3.关闭会话__
 
-			sess.close
+		sess.close
 
 
 __例子： 会话执行操作__
