@@ -1,6 +1,6 @@
 # TensorBoard可视化工具
 
-## tensorboard对我们的帮助：
+## TensorBoard对我们的帮助：
   
   __一、在数据处理过程中，用户通常想要可视化地直观查看数据集分布情况。__
     
