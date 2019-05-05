@@ -1,0 +1,34 @@
+
+### CNN 简介
+CNN模型是一种以卷积为核心的前馈神经网络模型。 20世纪60年代，Hubel和Wiesel在研究猫脑 皮层中用于局部敏感和方向选择的神经元时发现其独特的网络结构可以有效地降低反馈神经网 络的复杂性，继而提出了卷积神经网络（ConvoluTIonal Neural Networks，简称CNN）。
+
+和softmax神经网络模型也是类似的，CNN其实在我们大脑里去对某一些特定的图像，其实是有一些神经元对他进行识别的，图中就是一个cnn模型， 图中的input和output是我们的输入输出，整个网络结构中我们可以看到上面的橙色的部分是我们的卷积层，(对应我们左下图的标签)  我们可以看到其中引入了我们的两种池化，一个是平均池化(AvgPool),一个是最大池化(MaxPool)这两个池化我们后面会讲,还有我们的Concat(将几个不同的结果连接在一起)，还有Dropout(解决过拟合的问题)，Fully connected是我们的全连接层，主要是用来你和一些函数，softmax是用来在我们输出的时候作为一个多分类器，他可以输出不同类别的概率。
+
+
+![Image_text](https://raw.githubusercontent.com/OneStepAndTwoSteps/TensorFlow_notes/master/static/CNN%E7%BD%91%E7%BB%9C/1.png)
+
+
+### 卷积（Convolution）
+  
+卷积是分析数学中的一种基础运算，其中对输入数据做运算时所用到的函数称为卷积核。 设:f(x), g(x)是R上的两个可积函数，作积分：
+首先我们先讲一下卷积的概念，卷积是分析数学中的一种基础运算，其中对输入数据做运算时所用到的函数称为卷积核。
+  
+    设:f(x), g(x)是R上的两个可积函数，作积分：我们可以写出他的表达式
+
+![Image_text](https://raw.githubusercontent.com/OneStepAndTwoSteps/TensorFlow_notes/master/static/CNN%E7%BD%91%E7%BB%9C/2.png)
+
+可以证明，关于几乎所有的实数x，上述积分是存在的。这样，随着x的不同取值，这个积分就 定义了一个如下的新函数，称为函数f与g的卷积
+
+![Image_text](https://raw.githubusercontent.com/OneStepAndTwoSteps/TensorFlow_notes/master/static/CNN%E7%BD%91%E7%BB%9C/3.png)
+
+
+
+
+
+
+
+
+
+
+
+
