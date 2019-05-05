@@ -13,7 +13,7 @@ CNN模型是一种以卷积为核心的前馈神经网络模型。 20世纪60年
 卷积是分析数学中的一种基础运算，其中对输入数据做运算时所用到的函数称为卷积核。 设:f(x), g(x)是R上的两个可积函数，作积分：
 首先我们先讲一下卷积的概念，卷积是分析数学中的一种基础运算，其中对输入数据做运算时所用到的函数称为卷积核。
   
-    设:f(x), g(x)是R上的两个可积函数，作积分：我们可以写出他的表达式
+     设:f(x), g(x)是R上的两个可积函数，作积分：我们可以写出他的表达式
 
 ![Image_text](https://raw.githubusercontent.com/OneStepAndTwoSteps/TensorFlow_notes/master/static/CNN%E7%BD%91%E7%BB%9C/2.png)
 
