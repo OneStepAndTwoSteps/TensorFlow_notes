@@ -32,7 +32,7 @@
 
     print(tf.get_variable_scope().reuse)            # False
 
-和上面一样，如果在 with 中设置 reuse = True，那么在该上下文中 reuse 都为 True。
+和上面一样，如果在 `with` 中设置 `reuse = True` ，那么在该 `with` 上下文中 `reuse` 都为 `True`。
 
 
 
