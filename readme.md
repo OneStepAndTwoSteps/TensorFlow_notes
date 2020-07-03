@@ -1,5 +1,31 @@
 # Tensorflow notebook
 
+
+## `tf.GraphKeys`
+
+`tf.GraphKeys` 包含所有 `graph collection` 中的标准集合名
+
+在创建图的过程中，`TensorFlow` 的 `Python` 底层会自动用一些 `collection` 对 `op` 进行归类，方便之后的调用。这部分 `collection` 的名字被称为 `tf.GraphKeys` ，可以用来获取不同类型的 `op` 。当然，我们也可以自定义 `collection` 来收集 `op`。
+
+### `常见GraphKeys`
+
+* __GLOBAL_VARIABLES__ : 该 `collection` 默认加入所有的 `Variable` 对象，并且在分布式环境中共享。一般来说,`TRAINABLE_VARIABLES` 包含在 `MODEL_VARIABLES` 中，`MODEL_VARIABLES` 包含在 `GLOBAL_VARIABLES` 中。
+
+* __LOCAL_VARIABLES__ : 与 `GLOBAL_VARIABLES` 不同的是，它只包含本机器上的 `Variable` ，即不能在分布式环境中共享。
+
+* __MODEL_VARIABLES__ : 顾名思义，模型中的变量，在构建模型中，所有用于正向传递的 `Variable` 都将添加到这里。
+
+* __TRAINALBEL_VARIABLES__ : 所有用于反向传递的 `Variable`，即可训练(可以被optimizer优化，进行参数更新)的变量。
+
+* __SUMMARIES__ : 跟 `Tensorboard` 相关，这里的 `Variable` 都由 `tf.summary` 建立并将用于可视化。
+
+* __QUEUE_RUNNERS__ ：`QueueRunner` 用于产生计算输入的对象。
+
+* __MOVING_AVERAGE_VARIABLES__ ：`Variable` 还将保持移动平均值的对象子集。
+
+* __REGULARIZATION_LOSSES__ ：在图形构建期间收集的正则化损失。
+
+
 ## `变量管理：tf.variable_scope`
 
 如果要在图形的各个组件之间共享一个变量，一个简单的选项是首先创建它，然后将其作为 参数传递给需要它的函数，但是当有很多共享参数时那么必须一直将它们作为参数传递，这将是非常痛苦的。
@@ -73,6 +99,16 @@
 
 但是要注意的是，`eval()` 只能用于 tf.Tensor 类对象，也就是有输出的 Operation。对于没有输出的 Operation, 可以用 .run() 或者 Session.run() 。Session.run() 没有这个限制。
 
+
+## tensorflow动态设置trainable
+
+tensorflow 中定义的 `tf.Variable` 时，可以通过 `trainable` 属性控制这个变量是否可以被优化器更新。但是，`tf.Variable` 的 `trainable` 属性是 `只读` 的，我们__无法动态更改这个只读属性__。在定义 `tf.Variable` 时，如果指定 `trainable=True` ，那么会把这个`Variable` 添加到 __“可被训练的变量”__ 集合中。
+
+案例：
+
+        input_data = tf.Variable(data_initalizer, trainable=False)
+
+这样我们就不会在训练的时候尝试更新它的值。
 
 ## `tf.cast`
 
@@ -213,6 +249,72 @@
                 with tf.control_dependencies(extra_update_ops):
                         training_op = optimizer.minimize(loss)
 
+## `tf.GraphKeys`
+
+* https://blog.csdn.net/hustqb/article/details/80398934
+
+## `tf.get_collection`
+
+* https://www.jianshu.com/p/73034fba50c7
+
+此函数有两个参数，key和scope。
+
+        tf.get_collection(
+            key,
+            scope=None
+        )
+
+* key: 收集的关键.例如,GraphKeys 类包含许多集合的标准名称.
+
+* scope：(可选)如果提供,则筛选结果列表为仅包含 name 属性匹配 re.match 使用的项目.如果一个范围是提供的,并且选择或 re. match 意味着没有特殊的令牌过滤器的范围,则不会返回没有名称属性的项.
+
+案例1：
+
+        reuse_vars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES,scope='hidden[123]')
+
+        for i in reuse_vars:
+        print(i)
+
+输出1：
+
+        <tf.Variable 'hidden1/kernel:0' shape=(784, 300) dtype=float32_ref>
+        <tf.Variable 'hidden1/bias:0' shape=(300,) dtype=float32_ref>
+        <tf.Variable 'hidden2/kernel:0' shape=(300, 50) dtype=float32_ref>
+        <tf.Variable 'hidden2/bias:0' shape=(50,) dtype=float32_ref>
+        <tf.Variable 'hidden3/kernel:0' shape=(50, 50) dtype=float32_ref>
+        <tf.Variable 'hidden3/bias:0' shape=(50,) dtype=float32_ref>
+
+案例2：
+
+        reuse_vars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES,scope='hidden[123]')
+        reuse_vars_dict = dict([(var.op.name,var) for var in reuse_vars]) 
+        print(reuse_vars_dict)
+
+        # 所谓op就是operation，“操作”的意思。
+        # 在tensorflow中op不仅包括加、减、乘、除等所有计算方式，同时也包括常量定义、变量定义、占位符定义等等
+输出2：
+
+
+        {'hidden1/kernel': <tf.Variable 'hidden1/kernel:0' shape=(784, 300) dtype=float32_ref>, 
+        'hidden1/bias': <tf.Variable 'hidden1/bias:0' shape=(300,) dtype=float32_ref>, 
+
+        'hidden2/kernel': <tf.Variable 'hidden2/kernel:0' shape=(300, 50) dtype=float32_ref>, 
+        'hidden2/bias': <tf.Variable 'hidden2/bias:0' shape=(50,) dtype=float32_ref>, 
+
+        'hidden3/kernel': <tf.Variable 'hidden3/kernel:0' shape=(50, 50) dtype=float32_ref>, 
+        'hidden3/bias': <tf.Variable 'hidden3/bias:0' shape=(50,) dtype=float32_ref>}
+
+扩展：
+
+
+
+
+### `在tensorflow 复用之前模型时可以使用`
+        
+        # 获取 tf.GraphKeys.GLOBAL_VARIABLES 正则匹配出 名为 hidden1,hidden2,hidden3 的隐藏层
+        reuse_vars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES,scope='hidden[123]')
+
+
 
 
 
@@ -226,7 +328,85 @@
 
 BN 在如今的CNN结果中已经普遍应用，在 tensorflow 中可以通过 tf.layers.batch_normalization() 这个 op 来使用 BN 。该op隐藏了对 BN 的 mean var alpha beta 参数的显示申明，因此在训练和部署测试中需要特征注意正确使用 BN 的姿势。
 
+* `batch normalization` 的兩個重要的參數，`moving_mean` 和 `moving_var`,两个 `batch_normalization` 中更新 `mean` 和 `variance` 的操作，需要保证它们在train_op前完成。
 
+* 这两个操作是在 `tensorflow` 的内部实现中自动被加入 `tf.GraphKeys.UPDATE_OPS` 这个集合的，在 `tf.contrib.layers.batch_norm` 的参数中可以看到有一项`updates_collections` 的默认值即为 `tf.GraphKeys.UPDATE_OPS` ，而在 `tf.layers.batch_normalization` 中则是直接将两个更新操作放入了上述集合。
+
+#### 小结：
+
+* 1、如果不通过 `tf.get_collection` 来获取，`moving_mean` 和 `moving_var` 不会更新，一直都会是初始值。
+
+* 2、当然 如果进行批量标准化更新参数，`tf.layers.batch_normalization` 中的  `training` 要设置为 `True` : `tf.placeholder_with_default(True, (), name='training')`，否则一样不会更新，一直是默认值。
+
+案例：
+
+        tf.reset_default_graph()
+
+        import cv2
+        import numpy as np
+        import tensorflow as tf
+
+        OUTPUT_PATH = "./static/"
+
+
+        def with_update_op():
+        input_node = tf.placeholder(shape=[None, 828, 828, 3], dtype=tf.float32, name='input_node')
+        training_node = tf.placeholder_with_default(True, (), name='training')       
+
+        net = tf.layers.conv2d(input_node, 32, (3, 3), strides=(2, 2), padding='same', name='conv_1')
+        net = tf.layers.batch_normalization(net, training=training_node, name='bn')
+
+        moving_mean = tf.get_default_graph().get_tensor_by_name(
+                "bn/moving_mean/read:0")
+        moving_var = tf.get_default_graph().get_tensor_by_name(
+                "bn/moving_variance/read:0")
+
+        update_op = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
+        print(f'update_op: {update_op}')
+
+        with tf.control_dependencies(update_op):
+                train_op = tf.identity(net, name='train_op')
+
+        with tf.Session() as sess:
+                sess.run(tf.global_variables_initializer())
+                sess.run(tf.local_variables_initializer())
+
+                image = cv2.imread('./static/5.jpg')
+                image = np.expand_dims(image, 0)
+
+                for _ in range(100):
+                sess.run(train_op, feed_dict={input_node: image})
+
+                result, mm, mv = sess.run([net, moving_mean, moving_var], feed_dict={input_node: image, training_node: False})
+                print(f'with_update_op:\n(mm , mv) : ({mm[0]:.2f} , {mv[0]:.2f})\n{result[0, 22:28, 22:28, 0]}')
+
+        if __name__ == '__main__':
+        with_update_op()
+
+输出 `training_node` 为 `True` 时：
+
+        update_op: [<tf.Operation 'bn/AssignMovingAvg' type=AssignSub>, <tf.Operation 'bn/AssignMovingAvg_1' type=AssignSub>]
+        with_update_op:
+        (mm , mv) : (8.66 , 46.46)
+        [[1.5568205 1.5774531 1.3624308 1.4405    1.5099181 1.5810336]
+        [1.2992268 1.1960205 1.6491984 1.6908268 1.6503065 1.5132973]
+        [1.434818  1.4800171 1.3924334 1.4717836 1.373104  1.4020574]
+        [1.4718883 1.5243348 1.3832653 1.408858  1.3932242 1.3871188]
+        [1.2360413 1.4078094 1.3912197 1.4431741 1.3649222 1.3797808]
+        [1.0193416 1.1184596 1.3712288 1.4098966 1.3528184 1.2568338]]
+                
+
+输出 `training_node` 为 `False` 时：
+
+        update_op: [<tf.Operation 'bn/AssignMovingAvg' type=AssignSub>, <tf.Operation 'bn/AssignMovingAvg_1' type=AssignSub>]
+        with_update_op:
+        (mm , mv) : (0.00 , 1.00)
+        [[-26.099098 -24.50463  -23.484959 -23.751635 -24.907955 -26.5072  ]
+        [-28.166416 -26.142298 -24.732868 -25.649944 -26.916319 -27.471415]
+        [-27.693466 -27.60965  -28.0536   -28.266209 -28.004934 -26.826029]
+        [-26.860437 -27.126112 -28.101397 -27.989363 -27.83019  -26.506882]
+        [-27.308222 -27.217316 -28.299051 -27.909836 -26.972256 -26.672089]
+        [-25.121971 -25.208494 -28.042562 -27.30125  -26.96312  -26.636875]]
 
 # `tf.nn`
 
